@@ -7,7 +7,7 @@
  */ 
 class Mediator{
 	public $title = 'Mediator';
-	public $version='1.0.0';
+	public $version='1.5.0';
 	public $desc = 'Mediator - I do what you do, -_- only faster -_-';
 	/**
 	 * Method to parse the copied row content from Google sheet.

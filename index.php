@@ -1,80 +1,33 @@
-<?php 
-require_once 'class.Mediator.php';
-$data = new Mediator();
-if($_POST['content']){
-	$processed = $data->parseContent($_POST['content']);
-}
-?>
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta http-equiv="X-UA-Compatible" content="IE=edge">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title><?php echo $data->desc; ?></title>
-
-<script type="text/javascript" src="assets/js/jquery.min.js"></script>
-<link rel="stylesheet" href="assets/css/bootstrap.min.css">
-<script src="assets/js/bootstrap.min.js"></script>
-
-
+  <?php 
+  require_once 'class.Mediator.php';
+  $data = new Mediator();
+  if(@trim($_POST['content'])){
+  	$processed = $data->parseContent($_POST['content']);
+  }
+  ?>
+    <meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="description" content="<?php echo $data->desc; ?>">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
+	<title><?php echo $data->title." ".$data->version; ?></title>
+	<link rel="stylesheet"	href="https://fonts.googleapis.com/icon?family=Material+Icons">
+	<link rel="stylesheet" href="assets/css/material.min.css">
+	<link rel="stylesheet" href="assets/css/main.css">
+	
+	<script src="assets/js/material.min.js"></script>
 </head>
 <body>
-	<nav class="navbar navbar-inverse">
-		<div class="container-fluid">
-			<div class="navbar-header">
-				<button type="button" class="navbar-toggle collapsed"
-					data-toggle="collapse" data-target="#bs-example-navbar-collapse-2">
-					<span class="sr-only">Toggle navigation</span> <span
-						class="icon-bar"></span> <span class="icon-bar"></span> <span
-						class="icon-bar"></span>
-				</button>
-				<a class="navbar-brand" href="#"><?php echo $data->title." v".$data->version; ?></a>
+	<!-- Simple header with scrollable tabs. -->
+	<div class="mdl-layout mdl-js-layout mdl-layout--fixed-header">
+		<header class="mdl-layout__header">
+			<div class="mdl-layout__header-row">
+				<!-- Title -->
+				<span class="mdl-layout-title"><?php echo $data->title." ".$data->version; ?></span>
 			</div>
-		</div>
-	</nav>
-
-	<div class="container">
-		<div class="row">
-			<div class="col-sm-12">
-				<h3><?php echo $data->desc; ?></h3>
-
-				<form method="post" action="">
-					<div class="form-group has-success">
-						<label for="textArea" class="col-lg-2 control-label"><strong>Paste
-								Projects Report Here --></strong></label>
-						<div class="col-lg-10">
-							<textarea name="content" id="content"
-								class="form-control content" rows="15" cols="120"><?php echo @$_POST['content']; ?></textarea>
-							<span class="help-block">Paste your text above this line.</span>
-							<div class="checkbox">
-							<?php 
-							/**
-							 * This is custom
-							 */
-							$checks = array(
-									'1'=>'Name',
-									'0'=>'Timestamp',
-									'3'=>'Date'									
-							);
-							foreach ($checks as $val=>$eachcheck):
-								
-							?>
-								<label> <input type="checkbox" name="show[]" value="<?php echo $val; ?>" <?php if(in_array($val,$_POST['show'])) echo "checked";?>> <?php echo $eachcheck; ?> </label> 
-							<?php endforeach; ?>
-							</div>
-						</div>
-					</div>
-
-					<input type="submit" name="submit" value="submit"
-						class="btn btn-default btn-lg">
-				</form>
-			</div>
-		</div>
-		<br />
-		<div class="row">
-			<div class="col-sm-12">
-				<?php
+			<?php
 				
 				if(!empty($processed)){
 					$manipulated = array ();
@@ -86,42 +39,98 @@ if($_POST['content']){
 								'rating'=>$eachentry[5]
 						);
 					}
-					/**
-					 * Printing logic
-					 */
-					foreach ($manipulated as $eachproject=>$userdata){
+					/* echo "<pre>";
+					var_dump($manipulated);
+					echo "</pre>"; */
+					
+				}
+				
+				
 						?>
-						<div class="panel panel-default">
+			<!-- Tabs -->
+			<div class="mdl-layout__tab-bar mdl-js-ripple-effect">
+				<?php 
+				
+				if(@trim($_POST['content']) && !empty($manipulated)):
+				$counter=0;
+					foreach ($manipulated as $eachproject=>$userdata):
+						echo '<a href="#'.str_replace(" ","",$eachproject).'" class="mdl-layout__tab '.(($counter==0)?'is-active':'').'">'.str_replace(" ","",$eachproject).'</a>';
+					$counter++;
+					endforeach;
+				endif;
+				?>
+			</div>
+		</header>
+		<div class="mdl-layout__drawer">
+			<span class="mdl-layout-title">Nothing to show ....yet!!</span>
+		</div>
+		<main class="mdl-layout__content">
+		<?php if(!@trim($_POST['content'])): ?>
+		<section class="docs-text-styling about-panel about-panel--text mdl-cell mdl-cell--12-col">
+			<dl>
+				<dd>
+					<!-- Textfield with Floating Label -->
+
+					<form action="" method="post" >
+					
+						<div class="checkbox">
 							<?php 
-							echo "<div class='panel-heading'>" . $eachproject . "</div><div class='panel-body'>";
-							foreach ($userdata as $eachusername=>$eachreport){
-								if(in_array("1",$_POST['show']))
-									echo '<h5  class="text-danger">' . $eachusername . '</h5>';
-								foreach ($eachreport as $eachdate=>$eachentry){
-									if(in_array("0",$_POST['show']))
-										echo '<strong><i>'.$eachdate."</i></strong><br />";
-									if(in_array("3",$_POST['show']))
-										echo '<p class="text-primary">'.$eachentry['date']."</p>";
-									echo nl2br($eachentry['update'])."<br />";
-									if($eachentry['notes']):
-									?>
-										<blockquote>
-											<p><?php echo nl2br($eachentry['notes']); ?></p>
-										</blockquote>
-									<?php 
-									endif;
-								}
-							}
-							echo "</div>";
+								$checks = array(
+										'1'=>'Name',
+										'0'=>'Timestamp',
+										'3'=>'Date'									
+								);
+								foreach ($checks as $val=>$eachcheck):
+							?>
+								<label class="mdl-checkbox mdl-js-checkbox mdl-js-ripple-effect" for="showbox-<?php echo $val; ?>">
+								  <input  name="show[]" type="checkbox" id="showbox-<?php echo $val; ?>" class="mdl-checkbox__input" <?php if(in_array($val,$_POST['show'])) echo "checked";?>>
+								  <span class="mdl-checkbox__label"><?php echo $eachcheck; ?></span>
+								</label> 
+							<?php endforeach; ?>
+							</div>
+						<div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+							<textarea class="mdl-textfield__input" name="content" type="text" rows= "2" style="width:700px" id="content" ><?php echo @$_POST['content']; ?></textarea>
+							<label class="mdl-textfield__label" for="content">Paste your Report Summary here...</label>
+						</div>
+						<!-- Colored FAB button with ripple -->
+						<button class="mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect mdl-button--colored donebutton" id="donebutton">
+						  <i class="material-icons">done</i>
+						</button>
+						<!-- Rich Tooltip -->
+							<div class="mdl-tooltip" data-mdl-for="donebutton">
+								Done
+							</div>
+					</form>
+				</dd>
+			</dl>
+		</section>
+		<?php endif; ?>
+				<?php 
+				if(@$_POST['content'] && !empty($manipulated)):
+					$counter=0;
+						foreach ($manipulated as $eachproject=>$userdata):
+							echo '<a href="#'.str_replace(" ","",$eachproject).'" class="mdl-layout__tab">'.$eachproject.'</a>';
+					?>
+					<section class="mdl-layout__tab-panel <?php if($counter==0) echo 'is-active'; ?>" id="<?php echo str_replace(" ","",$eachproject); ?>">
+						<div class="page-content">
+							<!-- Your content goes here -->
+							<?php 
+							echo "<pre>";var_dump($userdata);echo "</pre>";
 							?>
 						</div>
-						<?php 
-					}
-				}
+					</section>
+					<?php 
+						$counter++;
+						endforeach;
+					endif;
+				
 				?>
+		</main>
 
-			</div>
-		</div>
 	</div>
+
+
+
+
 </body>
 </html>
