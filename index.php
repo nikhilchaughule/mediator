@@ -83,7 +83,7 @@
 								foreach ($checks as $val=>$eachcheck):
 							?>
 								<label class="mdl-checkbox mdl-js-checkbox mdl-js-ripple-effect" for="showbox-<?php echo $val; ?>">
-								  <input  name="show[]" type="checkbox" id="showbox-<?php echo $val; ?>" class="mdl-checkbox__input" <?php if(in_array($val,$_POST['show'])) echo "checked";?>>
+								  <input  name="show[]" type="checkbox" id="showbox-<?php echo $val; ?>" class="mdl-checkbox__input" <?php if(in_array($val,@$_POST['show'])) echo "checked";?> value="<?php echo $val; ?>">
 								  <span class="mdl-checkbox__label"><?php echo $eachcheck; ?></span>
 								</label> 
 							<?php endforeach; ?>
