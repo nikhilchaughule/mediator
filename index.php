@@ -75,7 +75,68 @@ if($_POST['content']){
 		<div class="row">
 			<div class="col-sm-12">
 				<?php
+// 				echo "<pre>";var_dump($processed);echo "</pre>";
+				if(!empty($processed)){
+					$userwise = array ();
+					foreach ($processed as $eachentry){
+						$userwise[$eachentry[4]][$eachentry[6]][strtotime($eachentry[0])]= array(
+								'date'=>strtotime($eachentry[3]),
+								'content'=>$eachentry[2],
+								'notes'=>$eachentry[7],
+								'rating'=>$eachentry[5]
+						);
+					}
+				}
 				
+				
+				foreach($userwise as $email=>$eachuser):
+// 				var_dump(array_keys($userwise));
+				$dummy = [];
+				foreach ($eachuser as $timestamp=>$eachentry){
+					$counter= 0;
+					foreach ($eachentry as $eachdate=>$eachreport){
+// 						echo $counter;
+// 						echo "<pre>";print($eachreport["content"]);echo "</pre>";
+						$contentsplit = explode(PHP_EOL,$eachreport["content"]);
+						$last ="";
+						foreach ($contentsplit as $eachline){
+// 							$eachline = str_replace(array("\t","&tbsp;"," ","&#8203;")," ",$eachline);
+							$eachline = preg_replace('/[\x00-\x1F\x7F-\xFF]/', '', $eachline);
+								
+							if(strpos($eachline,"-")===0){
+								$dummy[trim($eachline)]=[];
+								$last = trim($eachline);
+							}elseif(strpos($eachline,"-")>0){
+								$dummy[$last][] = trim($eachline);
+							}else{
+								$dummy['otherpoints'][]=$eachline;
+							}
+							/* echo "<pre>";
+							var_dump($eachline);
+							var_dump(strpos($eachline,"-"));
+							echo "</pre>"; */
+						}
+						/* if($counter>=3){
+							die();
+						} */
+						/* echo "<pre>".$eachuser;
+						var_dump($dummy);
+						echo "</pre>"; */
+// 						$counter++;
+					}
+					
+				}
+				echo "<pre>".$email;
+				echo "<br />";
+				echo "Count of updates = ".count($dummy);
+				foreach ($dummy as $eachmajorupdate=>$minorUpdates){
+					echo "<p>".$eachmajorupdate."=>".count($minorUpdates)."</p>";
+				}
+				echo "</pre>";
+				
+				endforeach;
+// 				echo "<pre>";var_dump($userwise["nirmala.jadhav@inscripts.in"]);echo "</pre>";
+				exit;
 				if(!empty($processed)){
 					$manipulated = array ();
 					foreach ($processed as $eachentry){
